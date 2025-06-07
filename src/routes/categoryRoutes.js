@@ -11,7 +11,7 @@ const {
 } = require("../middleware/authMiddleware");
 
 router.post("/create", authenticateToken, authorizeAdmin, createCategory);
-router.post("/get-all", getCategories);
+router.get("/get-all", getCategories);
 router.put(
   "/update/:categoryId",
   authenticateToken,

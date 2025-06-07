@@ -1,11 +1,30 @@
 const Article = require("../models/articleModel");
 const catchAsync = require("../utils/catchAsync");
+const httpStatus = require("http-status");
 
 const getArticles = catchAsync(async (req, res) => {
-  const articles = await Article.find();
-  res.json(articles);
+  const option = pick(req.query, ["limit", "page"]);
+  console.log(option);
+  const articles = await Article.paginate({}, option);
+  // .find()
+  //     .populate("catId", "title")
+  //     .sort({ createdAt: -1 })
+
+  res.send({ status: httpStatus.OK, data: { results: articles } });
 });
 
+const getArticle = catchAsync(async (req, res) => {
+  const { catId } = req.params;
+
+  const articles = await Article.find({ catId })
+    .populate("catId", "title")
+    .sort({ createdAt: -1 });
+
+  res.send({
+    status: httpStatus.OK,
+    data: { results: articles },
+  });
+});
 const createArticle = catchAsync(async (req, res) => {
   const article = new Article(req.body);
   await article.save();
@@ -13,6 +32,7 @@ const createArticle = catchAsync(async (req, res) => {
 });
 const updateArticle = catchAsync(async (req, res) => {
   const { articleId } = req.params;
+  console.log("articleId", articleId);
   const updatedArticle = await Article.findByIdAndUpdate(articleId, req.body, {
     new: true,
   });
@@ -29,5 +49,7 @@ const updateArticle = catchAsync(async (req, res) => {
 
 module.exports = {
   getArticles,
-  createArticle,updateArticle
+  getArticle,
+  createArticle,
+  updateArticle,
 };

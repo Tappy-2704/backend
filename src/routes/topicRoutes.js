@@ -11,7 +11,7 @@ const {
 } = require("../middleware/authMiddleware");
 
 router.post("/create", authenticateToken, authorizeAdmin, createTopic);
-router.post("/get-all", getTopics);
+router.get("/get-all", getTopics);
 router.put("/update/:topicId", authenticateToken, authorizeAdmin, updateTopic);
 
 module.exports = router;

@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const {
-  getArticles,
+  getArticles,getArticle,
   createArticle,
   updateArticle,
 } = require("../controllers/articleController");
@@ -11,9 +11,10 @@ const {
 } = require("../middleware/authMiddleware");
 
 router.post("/create", authenticateToken, authorizeAdmin, createArticle);
-router.post("/get-all", getArticles);
+router.get("/get-all", getArticles);
+router.get("/:catId", getArticle);
 router.put(
-  "/update/:topicId",
+  "/update/:articleId",
   authenticateToken,
   authorizeAdmin,
   updateArticle

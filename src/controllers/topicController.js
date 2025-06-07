@@ -1,9 +1,10 @@
 const Topic = require("../models/topicModel");
 const catchAsync = require("../utils/catchAsync");
+const httpStatus = require("http-status");
 
 const getTopics = catchAsync(async (req, res) => {
-  const topics = await Topic.find();
-  res.json(topics);
+ const topics = await Topic.find().sort({ createdAt: -1 });
+  res.send({ status: httpStatus.OK, data: { results: topics } });
 });
 
 const createTopic = catchAsync(async (req, res) => {

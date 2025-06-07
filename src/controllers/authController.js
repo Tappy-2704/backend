@@ -2,6 +2,7 @@ const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
 const User = require("../models/userModel");
 const catchAsync = require("../utils/catchAsync");
+const httpStatus = require("http-status");
 
 const register = catchAsync(async (req, res) => {
   try {
@@ -36,7 +37,7 @@ const login = catchAsync(async (req, res) => {
     const token = jwt.sign(
       { userId: user._id, email: user.email, role: user.role },
       process.env.JWT_SECRET,
-      { expiresIn: "1h" }
+      { expiresIn: "1000h" }
     );
 
     res.json({ message: "Login successful", token });
@@ -45,7 +46,39 @@ const login = catchAsync(async (req, res) => {
   }
 });
 
+// admin
+const loginAdmin = catchAsync(async (req, res) => {
+  try {
+    const { email, password } = req.body;
+    const user = await User.findOne({ email });
+
+    if (
+      user.role !== "admin" ||
+      !user ||
+      !(await bcrypt.compare(password, user.password))
+    ) {
+      return res.status(404).json({ message: "Invalid email or password" });
+    }
+
+    const token = jwt.sign(
+      { userId: user._id, email: user.email, role: user.role },
+      process.env.JWT_SECRET,
+      { expiresIn: "1000h" }
+    );
+
+    return res.send({
+      status: httpStatus.OK,
+      data: { token },
+      message: "Login successfully!",
+    });
+  } catch (error) {
+    console.log("error", error);
+    res.status(500).json({ message: "Error logging in" });
+  }
+});
+
 module.exports = {
   register,
   login,
+  loginAdmin,
 };

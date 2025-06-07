@@ -1,9 +1,13 @@
 const Category = require("../models/categoryModel");
 const catchAsync = require("../utils/catchAsync");
+const httpStatus = require("http-status");
 
 const getCategories = catchAsync(async (req, res) => {
-  const categories = await Category.find();
-  res.json(categories);
+  const categories = await Category.find()
+    .populate("topicId", "title")
+    .sort({ createdAt: -1 });
+
+  res.send({ status: httpStatus.OK, data: { results: categories } });
 });
 
 const createCategory = catchAsync(async (req, res) => {
